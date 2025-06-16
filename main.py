@@ -1,7 +1,7 @@
 import sys
 from auto_messenger import AutoMessenger
 from clients import CustomersDatabase
-from browser import make_chrome_browser, OPTIONS
+from browser import WebChromeBrowser
 from format_print import format_print
 from db_whatsapp import insert_data
 
@@ -10,11 +10,12 @@ from db_whatsapp import insert_data
     para ações de recuperação de créditos.
 """
 if __name__ == "__main__":
+    print('-' * 25)
     user = input("Digite o usuário: ")
-
-    start_date = '31/12/1900'
-
+    print('-' * 25)
     end_date = input("Digite a data: ")
+    print('-' * 25)
+    start_date = '31/12/1900'
 
     excluded_customers = [
         ("")
@@ -37,23 +38,20 @@ if __name__ == "__main__":
 
     if question == 'Y':
         # Definir o navegador e o site
-        browser = make_chrome_browser(*OPTIONS)
-        website = "https://web.whatsapp.com/"
+        manager = WebChromeBrowser()
+        driver = manager.get_driver()
 
         # Instanciar o objeto mensagem
         message_conf = AutoMessenger(
             ajusted_refined_charges,
-            browser,
-            website
+            driver,
+            'https://web.whatsapp.com/'
         )
         # Envia as cobranças
         billed_customers = message_conf.run_billing()
 
         # Grava no banco de dados
         insert_data(billed_customers)
-
-        # Encerra a aplicação
-        sys.exit()
 
     else:
         print('Obrigado!')

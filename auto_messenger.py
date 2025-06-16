@@ -1,6 +1,7 @@
 import urllib.parse
 import urllib
 from tqdm import tqdm
+from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
@@ -21,9 +22,9 @@ class AutoMessenger:
         em .xlsx com os dados da cobrança e
         retorna um valor None.
     '''
-    def __init__(self, costumers_list, browser, website: str):
+    def __init__(self, costumers_list, browser: WebDriver, website: str):
         self.costumers_list = costumers_list
-        self.browser = browser
+        self.browser: WebDriver = browser
         self.website = website
 
     def run_billing(self):
@@ -87,21 +88,21 @@ class AutoMessenger:
 
             finally:
                 pass
-
+        self.browser.quit()
         return data
 
-    def format_number(self, num):
+    def format_number(self, num: str) -> str:
         valor_ = f'{num:_.2f}'
         valor_fmt = valor_.replace('.', ',').replace('_', '.')
         return valor_fmt
 
-    def create_message(self, pessoa, num):
+    def create_message(self, pessoa: str, num: str) -> str:
         emoji = "\U0001F6A8"  # Código em unicode do emoji "sirene"
         n = 2  # número que vai repetir o emoji por 'n' vezes.
         text = (
             f'Oi {pessoa}, aqui é da Loja São Lucas da BR-316, '
             f'verificamos que o senhor(a) tem débito(s) '
-            f'em atraso no total de, '
+            f'em atraso no total de '
             f'*R$ {self.format_number(num)}*. '
             f'Entre em contato para mais informações.{emoji * n}'
         )
