@@ -34,7 +34,7 @@ if __name__ == "__main__":
     format_print(ajusted_refined_charges)
 
     # Controle de fluxo
-    question = input('DESAJA CONTINUAR? (Y) ou (N): ')
+    question = input('DESAJA CONTINUAR? (Y) ou (N): ').upper()
 
     if question == 'Y':
         # Definir o navegador e o site
