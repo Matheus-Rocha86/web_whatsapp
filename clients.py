@@ -17,7 +17,6 @@ class CustomersDatabase:
         self.data_inf = data_inf
         self.data_sup = data_sup
         self.excluded_customers = []
-        self.insert_customers = []
 
     def db_customers(self):
         data_inf_obj = datetime.strptime(self.data_inf, "%d/%m/%Y").date()
@@ -97,9 +96,6 @@ class CustomersDatabase:
         listed_customers.clear()
         listed_customers.extend(filtered_ans)
         return filtered_ans
-
-    def insert_customers(self, insert_customers):
-        ...
 
 
 if __name__ == "__main__":
