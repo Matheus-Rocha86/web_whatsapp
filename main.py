@@ -18,7 +18,7 @@ if __name__ == "__main__":
     start_date = '31/12/1900'
 
     excluded_customers = [
-        ("")
+        ('')
     ]
     customer_list = CustomersDatabase(user, start_date, end_date)
     charges = customer_list.db_customers()

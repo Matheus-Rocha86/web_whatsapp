@@ -2,9 +2,10 @@ import urllib.parse
 import urllib
 from tqdm import tqdm
 from selenium.webdriver.chrome.webdriver import WebDriver
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from time import sleep
 from datetime import datetime
 from random import randint
@@ -42,6 +43,16 @@ class AutoMessenger:
         while len(self.browser.find_elements(By.ID, "side")) < 1:
             sleep(1)
 
+        # Verifica tela de boas-vindas
+        try:
+            wait = WebDriverWait(self.browser, randint(5, 15))
+            button = wait.until(EC.element_to_be_clickable(
+                (By.XPATH, "//button[contains(@class, 'x889kno')]"))
+            )
+            button.click()  # Manda o clique
+        except TimeoutException:
+            print('Mensagem de boas-vindas não presente.')
+
         # Cria uma lista de dados dos clientes
         data = []
 
@@ -67,36 +78,45 @@ class AutoMessenger:
             # Espera até os contatos carregarem na página
             while len(self.browser.find_elements(By.ID, "side")) < 1:
                 sleep(1)
-            # Esperar 15 seg para continuar
-            sleep(randint(5, 15))
 
-            # Verifica se o contato está cadastrado no Whatsapp
             try:
-                self.browser.find_element(By.CLASS_NAME, 'x12lqup9')
-
-            except NoSuchElementException:
-                # Esperar 15 seg para continuar
-                sleep(randint(5, 15))
-
                 # Envia a mensagem para o contato cadastrado no Whatsapp
-                self.browser.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div[1]/div[2]/div/p/span').send_keys(Keys.ENTER)
-                sleep(randint(5, 15))
-
+                wait = WebDriverWait(self.browser, randint(10, 15))
+                button_send = wait.until(
+                    EC.element_to_be_clickable((By.XPATH, "//button[contains(@aria-label, 'Enviar')]"))
+                )
+                sleep(randint(5, 10))
+                button_send.click()  # Manda o clique
+                sleep(randint(5, 10))
+            except TimeoutException:
+                # O número de telefone compartilhado por url é inválido
+                wait = WebDriverWait(self.browser, randint(10, 15))
+                button_url_inv = wait.until(
+                    EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'x889kno')]"))
+                )
+                sleep(randint(5, 10))
+                button_url_inv.click()  # Manda o clique
+                sleep(randint(5, 10))
+            else:
                 # Cria uma lista de tuplas com os dados dos clientes
                 from_costumers_list_to_data = (pessoa, valor, to_day)
                 data.append(from_costumers_list_to_data)
-
-            finally:
-                pass
         self.browser.quit()
         return data
 
     def format_number(self, num: str) -> str:
+        """
+        Formata números com "." e "," para separar
+        milhares e decimais
+        """
         valor_ = f'{num:_.2f}'
         valor_fmt = valor_.replace('.', ',').replace('_', '.')
         return valor_fmt
 
     def create_message(self, pessoa: str, num: str) -> str:
+        """
+        Gerador de mensagens ao cliente
+        """
         emoji = "\U0001F6A8"  # Código em unicode do emoji "sirene"
         n = 2  # número que vai repetir o emoji por 'n' vezes.
         text = (

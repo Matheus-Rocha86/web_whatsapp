@@ -43,4 +43,5 @@ def insert_data(dados):
             conexao.commit()
 
     except sqlite3.Error as erro:
-        print(f"Erro ao inserir dados: {erro}")
+        conexao.rollback()
+        raise sqlite3.Error(f"Erro ao inserir dados: {erro}") from erro
