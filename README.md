@@ -16,13 +16,13 @@ for example, the user who will query the database.
 
 The final output of the program is a list containing the contact's name, value, and the date the message was sent.
 
-## Classes principais:
+## Main Classes:
 - auto_messenger.py
     - Contains the core logic.
 - browser.py
     - Handles browser configuration (Chrome).
 
-## Classes secudárias e módulos:
+## Secondary Classes and Modules:
 - clients.py
     - Responsible for querying the database.
 - db_whatsapp.py (módulo)
@@ -32,5 +32,5 @@ The final output of the program is a list containing the contact's name, value, 
 
 ---
 
-# Nota final
+# Final Note
 The most important thing is to download the script, use it in the way that best suits you, and always remember—programming is fun. So, have fun! 
