@@ -16,7 +16,7 @@ if __name__ == "__main__":
     end_date = input("Digite a data: ")
     print('-' * 25)
     start_date = '31/12/1900'
-
+    message_type = input('Pressione "s" para alterar a mensagem de cobrança: ').upper()
     excluded_customers = [
         ('')
     ]
@@ -42,11 +42,19 @@ if __name__ == "__main__":
         driver = manager.get_driver()
 
         # Instanciar o objeto mensagem
-        message_conf = AutoMessenger(
-            ajusted_refined_charges,
-            driver,
-            'https://web.whatsapp.com/'
-        )
+        if message_type == 'S':
+            message_conf = AutoMessenger(
+                ajusted_refined_charges,
+                driver,
+                'https://web.whatsapp.com/',
+                billing_message=message_type
+            )
+        else:
+            message_conf = AutoMessenger(
+                ajusted_refined_charges,
+                driver,
+                'https://web.whatsapp.com/'
+            )
         # Envia as cobranças
         billed_customers = message_conf.run_billing()
 
