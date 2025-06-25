@@ -28,6 +28,8 @@ class AutoMessenger:
         self.browser: WebDriver = browser
         self.website = website
         self.billing_message = billing_message
+        self.data = []
+        self.data_no_send = []
 
     def run_billing(self):
         """
@@ -50,12 +52,10 @@ class AutoMessenger:
             button = wait.until(EC.element_to_be_clickable(
                 (By.XPATH, "//button[contains(@class, 'x889kno')]"))
             )
+            sleep(randint(10, 15))
             button.click()  # Manda o clique
         except TimeoutException:
             print('Mensagem de boas-vindas não presente.')
-
-        # Cria uma lista de dados dos clientes
-        data = []
 
         # Data de hoje
         to_day = datetime.today().strftime('%d-%m-%Y')
@@ -95,6 +95,9 @@ class AutoMessenger:
                     button_url_inv = wait.until(
                         EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'x889kno')]"))
                     )
+
+                    self.data_no_send.append(pessoa)
+
                     sleep(randint(10, 15))
                     button_url_inv.click()  # Manda o clique
                     sleep(randint(10, 15))
@@ -103,9 +106,14 @@ class AutoMessenger:
             else:
                 # Cria uma lista de tuplas com os dados dos clientes
                 from_costumers_list_to_data = (pessoa, valor, to_day)
-                data.append(from_costumers_list_to_data)
+                self.data.append(from_costumers_list_to_data)
         self.browser.quit()
-        return data
+        print()
+        print('-' * 25)
+        print('List of unnotified customers')
+        for customer in self.data_no_send:
+            print(customer)
+        return self.data
 
     def format_number(self, num: str) -> str:
         """

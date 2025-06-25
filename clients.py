@@ -1,5 +1,4 @@
 import fdb
-from datetime import datetime
 
 
 class CustomersDatabase:
@@ -19,11 +18,6 @@ class CustomersDatabase:
         self.excluded_customers = []
 
     def db_customers(self):
-        data_inf_obj = datetime.strptime(self.data_inf, "%d/%m/%Y").date()
-        data_sup_obj = datetime.strptime(self.data_sup, "%d/%m/%Y").date()
-        data_inf_standard = data_inf_obj.strftime('%Y-%m-%d')
-        data_sup_standard = data_sup_obj.strftime('%Y-%m-%d')
-
         try:
             # Abrir um cursor e uma conexão
             connect = fdb.connect(
@@ -70,7 +64,7 @@ class CustomersDatabase:
             vlr = 700
 
             result = cursor.execute(
-                sql1, (data_inf_standard, data_sup_standard, vlr)
+                sql1, (self.data_inf, self.data_sup, vlr)
             )
             result = result.fetchall()
         except fdb.Error as e:

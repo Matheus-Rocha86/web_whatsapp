@@ -4,6 +4,8 @@ from clients import CustomersDatabase
 from browser import WebChromeBrowser
 from format_print import format_print
 from db_whatsapp import insert_data
+from datetime import datetime
+from users import check_users
 
 """ O programa realiza notificações por mensagens
     instantâneas integrado ao Whatsapp. Utilizado
@@ -11,12 +13,38 @@ from db_whatsapp import insert_data
 """
 if __name__ == "__main__":
     print('-' * 25)
-    user = input("Digite o usuário: ")
+    print('Digite o usuário')
+    user = input('>>> ')
+    user_bool = check_users(user)
+    if user_bool is not True:
+        print('-' * 25)
+        sys.exit()
     print('-' * 25)
-    end_date = input("Digite a data: ")
+    try:
+        print('Digite a data')
+        end_date = (
+            datetime.strptime(input('>>> '), "%d/%m/%Y").date()
+        ).strftime('%Y-%m-%d')
+    except Exception as e:
+        print('-' * 25)
+        print(f'Error: {e}')
+        print('-' * 25)
+        print()
+        sys.exit()
     print('-' * 25)
-    start_date = '31/12/1900'
-    message_type = input('Pressione "s" para alterar a mensagem de cobrança: ').upper()
+    start_date = (
+        datetime.strptime('31/12/1900', "%d/%m/%Y").date()
+    ).strftime('%Y-%m-%d')
+    print('Deseja alterar a mensagem de cobrança? Sim[S]/Não[Enter]')
+    try:
+        message_type = input('>>> ').upper()
+        if message_type != 'S' and message_type != '':
+            raise ValueError('Entrada de dados incorreta!')
+    except ValueError as e:
+        print(f'Error: {e}')
+        print('-' * 25)
+        sys.exit()
+
     excluded_customers = [
         ('')
     ]
@@ -34,7 +62,13 @@ if __name__ == "__main__":
     format_print(ajusted_refined_charges)
 
     # Controle de fluxo
-    question = input('DESAJA CONTINUAR? (Y) ou (N): ').upper()
+    if message_type == 'S':
+        print('Mensagem de cobrança alterada.')
+        print()
+    else:
+        print('Mensagem de cobrança não alterada.')
+    print('DESAJA CONTINUAR? (Y) ou (N)')
+    question = input('>>> ').upper()
 
     if question == 'Y':
         # Definir o navegador e o site
