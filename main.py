@@ -45,21 +45,25 @@ if __name__ == "__main__":
         print('-' * 25)
         sys.exit()
 
+    # Customer exclusion
     excluded_customers = [
         ('')
     ]
-    customer_list = CustomersDatabase(user, start_date, end_date)
-    charges = customer_list.db_customers()
-    refined_charges = customer_list.number_processing(charges)
-    refined_charges_copy = refined_charges.copy()
-    ajusted_refined_charges = customer_list.to_delete_customers(
+    # Customer inclusion
+    inserted_customers = [
+        ('')
+    ]
+    db = CustomersDatabase(
+        user,
+        start_date,
+        end_date,
         excluded_customers,
-        refined_charges_copy
+        inserted_customers
     )
-
+    customers = db.db_customers()
     # Imprimir a lista em tela
     print()
-    format_print(ajusted_refined_charges)
+    format_print(customers)
 
     # Controle de fluxo
     if message_type == 'S':
@@ -78,14 +82,14 @@ if __name__ == "__main__":
         # Instanciar o objeto mensagem
         if message_type == 'S':
             message_conf = AutoMessenger(
-                ajusted_refined_charges,
+                customers,
                 driver,
                 'https://web.whatsapp.com/',
                 billing_message=message_type
             )
         else:
             message_conf = AutoMessenger(
-                ajusted_refined_charges,
+                customers,
                 driver,
                 'https://web.whatsapp.com/'
             )

@@ -11,11 +11,12 @@ class CustomersDatabase:
     :param data_inf: data inicial no formato, xx/xx/xxxx.
     :param data_sup: data final no formato, xx/xx/xxxx.
     """
-    def __init__(self, user: str, data_inf: str, data_sup: str):
+    def __init__(self, user: str, data_inf: str, data_sup: str, excluded_customers: list, inserted_customers: list):
         self.user = user
         self.data_inf = data_inf
         self.data_sup = data_sup
-        self.excluded_customers = []
+        self.excluded_customers = excluded_customers
+        self.inserted_customers = inserted_customers
 
     def db_customers(self):
         try:
@@ -75,9 +76,22 @@ class CustomersDatabase:
             # Fechar o cursor e a conexão
             cursor.close()
             connect.close()
-            return result
+
+            # Changes in the customer list
+            result_processed = self.number_processing(result)
+            result_refined = self.to_delete_customers(
+                self.excluded_customers, result_processed
+            )
+            if self.inserted_customers[0] != '':
+                result_finally = self.to_insert_customers(
+                    self.inserted_customers, result_refined
+                )
+                return result_finally
+            return result_refined
 
     def number_processing(self, ans):
+        """Filters numbers equal to 13 digits"""
+
         filtered_ans = [item for item in ans if len(item[2]) == 13]
         return filtered_ans
 
@@ -91,21 +105,7 @@ class CustomersDatabase:
         listed_customers.extend(filtered_ans)
         return filtered_ans
 
-
-if __name__ == "__main__":
-    joelma = CustomersDatabase('joelma', '31/12/1900', '29/03/2025')
-    matheus = CustomersDatabase('matheus', '31/12/1900', '29/03/2025')
-
-    excluded_customers = [
-        ('ADELINO CARNEIRO DE PAIVA')
-    ]
-
-    cliente_joelma = joelma.db_customers()
-    cliente_joelma = joelma.number_processing(cliente_joelma)
-    cliente_joelma_r = joelma.to_delete_customers(
-        excluded_customers,
-        cliente_joelma
-    )
-
-    for i in cliente_joelma_r:
-        print(i)
+    def to_insert_customers(self, inserted_customers, list_customers: list):
+        for customer in inserted_customers:
+            list_customers.append(customer)
+        return list_customers
