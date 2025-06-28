@@ -6,44 +6,29 @@ from format_print import format_print
 from db_whatsapp import insert_data
 from datetime import datetime
 from users import check_users
+from checker_data import get_user_input, get_yes_no_input
 
-""" O programa realiza notificações por mensagens
-    instantâneas integrado ao Whatsapp. Utilizado
-    para ações de recuperação de créditos.
 """
+The program sends notifications via instant messages
+integrated with WhatsApp.
+Used for credit recovery actions.
+"""
+
 if __name__ == "__main__":
     print('-' * 25)
-    print('Digite o usuário')
-    user = input('>>> ')
+    user = input('Digite o usuário\n>>> ')
     user_bool = check_users(user)
     if user_bool is not True:
         print('-' * 25)
         sys.exit()
     print('-' * 25)
-    try:
-        print('Digite a data')
-        end_date = (
-            datetime.strptime(input('>>> '), "%d/%m/%Y").date()
-        ).strftime('%Y-%m-%d')
-    except Exception as e:
-        print('-' * 25)
-        print(f'Error: {e}')
-        print('-' * 25)
-        print()
-        sys.exit()
-    print('-' * 25)
+
     start_date = (
         datetime.strptime('31/12/1900', "%d/%m/%Y").date()
     ).strftime('%Y-%m-%d')
-    print('Deseja alterar a mensagem de cobrança? Sim[S]/Não[Enter]')
-    try:
-        message_type = input('>>> ').upper()
-        if message_type != 'S' and message_type != '':
-            raise ValueError('Entrada de dados incorreta!')
-    except ValueError as e:
-        print(f'Error: {e}')
-        print('-' * 25)
-        sys.exit()
+
+    print('Digite a data')
+    end_date = get_user_input('>>> ')
 
     # Customer exclusion
     excluded_customers = [
@@ -61,46 +46,45 @@ if __name__ == "__main__":
         inserted_customers
     )
     customers = db.db_customers()
-    # Imprimir a lista em tela
+
+    # Print the list on screen
     print()
     format_print(customers)
 
-    # Controle de fluxo
+    # Question about billing message
+    message_type = get_yes_no_input(
+        'Deseja alterar a mensagem de cobrança? Sim[S]/Não[Enter]\n>>> '
+    )
+
+    # Flow control
     if message_type == 'S':
         print('Mensagem de cobrança alterada.')
         print()
     else:
         print('Mensagem de cobrança não alterada.')
-    print('DESAJA CONTINUAR? (Y) ou (N)')
-    question = input('>>> ').upper()
+    question = input('DESAJA CONTINUAR? (Y) ou (N)\n>>> ').upper()
 
     if question == 'Y':
-        # Definir o navegador e o site
+        # Set browser and website
         manager = WebChromeBrowser()
         driver = manager.get_driver()
 
-        # Instanciar o objeto mensagem
+        # Instantiate the message object
+        kwargs = {
+            'customers': customers,
+            'driver': driver,
+            'url': 'https://web.whatsapp.com/'
+        }
         if message_type == 'S':
-            message_conf = AutoMessenger(
-                customers,
-                driver,
-                'https://web.whatsapp.com/',
-                billing_message=message_type
-            )
-        else:
-            message_conf = AutoMessenger(
-                customers,
-                driver,
-                'https://web.whatsapp.com/'
-            )
-        # Envia as cobranças
+            kwargs['billing_message'] = message_type
+
+        message_conf = AutoMessenger(**kwargs)
+
+        # Send the charges
         billed_customers = message_conf.run_billing()
 
-        # Grava no banco de dados
+        # Save to the database
         insert_data(billed_customers)
-
     else:
-        print('Obrigado!')
-
-        # Encerra a aplicação
+        print('Thanks!')
         sys.exit()

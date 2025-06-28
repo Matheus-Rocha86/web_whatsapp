@@ -12,17 +12,17 @@ from random import randint
 
 
 class AutoMessenger:
-    ''' A classe rodar cobrança envia
-        mensagens de cobrança. Recebe como
-        parâmetro (website) uma string,
-        um (data_frame) a planilha em DataFrame,
-        o navegador configurado (browser)
-        e um nome de quem gera a cobrança
-        (usarname) em string.
-        Grava na raíz da pasta um arquivo
-        em .xlsx com os dados da cobrança e
-        retorna um valor None.
-    '''
+    """The class "rotate collection" sends
+    collection messages. It receives as a parameter (website) a string,
+    a spreadsheet in DataFrame (data_frame),
+    the configured browser (browser)
+    and a name of the person generating the collection
+    (usarname) in string.
+    It writes a file in .xlsx with the collection
+    data in the root of the folder and
+    returns a None value.
+    """
+
     def __init__(self, costumers_list, browser: WebDriver, website: str, billing_message=None):
         self.costumers_list = costumers_list
         self.browser: WebDriver = browser
@@ -32,65 +32,63 @@ class AutoMessenger:
         self.data_no_send = []
 
     def run_billing(self):
-        """
-        O método abre o navegador.
-
-        :Envia as mensagens de cobrança:
-        :Retorna um valor None:
+        """## The method opens the browser.
+            #### Sends billing messages:
+            #### Returns a None value:
         """
 
-        # Pega o link para abrir o Whatsapp
+        # Get the link to open Whatsapp
         self.browser.get(self.website)
 
-        # Mantem aberto o browser até o selenium encontrar algum elemento
+        # Keep the browser open until Selenium finds an element
         while len(self.browser.find_elements(By.ID, "side")) < 1:
             sleep(1)
 
-        # Verifica tela de boas-vindas
+        # Check welcome screen
         try:
             wait = WebDriverWait(self.browser, randint(5, 15))
             button = wait.until(EC.element_to_be_clickable(
                 (By.XPATH, "//button[contains(@class, 'x889kno')]"))
             )
             sleep(randint(10, 15))
-            button.click()  # Manda o clique
+            button.click()  # Send the click
         except TimeoutException:
             print('Mensagem de boas-vindas não presente.')
 
-        # Data de hoje
+        # Today's date
         to_day = datetime.today().strftime('%d-%m-%Y')
 
-        # Cria barra de progresso
+        # Create progress bar
         progress_bar = tqdm(range(len(self.costumers_list)), desc="Enviando mensagens")
 
-        # Percorrer a lista de contatos e envia a mensagem
+        #  Scroll through the contact list and send the message
         for i in progress_bar:
             pessoa = self.costumers_list[i][0]
             valor = self.costumers_list[i][1]
             numero = self.costumers_list[i][2]
 
-            # Atualiza a descrição dinamicamente
+            # Updates the description dynamically
             progress_bar.set_description(f"Enviando para {pessoa}")
             texto = self.create_message_default(pessoa, valor)
             link = f"https://web.whatsapp.com/send?phone={int(numero)}&text={texto}"
             self.browser.get(link)
 
-            # Espera até os contatos carregarem na página
+            # Wait for contacts to load on the page
             while len(self.browser.find_elements(By.ID, "side")) < 1:
                 sleep(1)
 
             try:
-                # Envia a mensagem para o contato cadastrado no Whatsapp
+                # Send the message to the contact registered on Whatsapp
                 wait = WebDriverWait(self.browser, 20)
                 button_send = wait.until(
                     EC.element_to_be_clickable((By.XPATH, "//button[contains(@aria-label, 'Enviar')]"))
                 )
                 sleep(randint(10, 15))
-                button_send.click()  # Manda o clique
+                button_send.click()  # Send the click
                 sleep(randint(10, 15))
             except TimeoutException:
                 try:
-                    # O número de telefone compartilhado por url é inválido
+                    # The phone number shared by url is invalid
                     wait = WebDriverWait(self.browser, 20)
                     button_url_inv = wait.until(
                         EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'x889kno')]"))
@@ -99,12 +97,12 @@ class AutoMessenger:
                     self.data_no_send.append(pessoa)
 
                     sleep(randint(10, 15))
-                    button_url_inv.click()  # Manda o clique
+                    button_url_inv.click()  # Send the click
                     sleep(randint(10, 15))
                 except TimeoutException as e:
                     print(f'Exceção: {e}')
             else:
-                # Cria uma lista de tuplas com os dados dos clientes
+                # Creates a list of tuples with customer data
                 from_costumers_list_to_data = (pessoa, valor, to_day)
                 self.data.append(from_costumers_list_to_data)
         self.browser.quit()
@@ -116,21 +114,19 @@ class AutoMessenger:
         return self.data
 
     def format_number(self, num: str) -> str:
-        """
-        Formata números com "." e "," para separar
-        milhares e decimais
+        """Formats numbers with "." and "," to separate
+        thousands and decimals
         """
         valor_ = f'{num:_.2f}'
         valor_fmt = valor_.replace('.', ',').replace('_', '.')
         return valor_fmt
 
     def create_message_default(self, pessoa: str, num: str) -> str:
-        """
-        Gerador de mensagens ao cliente
-        """
+        """Customer Message Generator"""
+
         if self.billing_message is None:
-            emoji = "\U0001F6A8"  # Código em unicode do emoji "sirene"
-            n = 2  # número que vai repetir o emoji por 'n' vezes.
+            emoji = "\U0001F6A8"  # Unicode code for the "siren" emoji
+            n = 2  # Number that will repeat the emoji 'n' times
             text = (
                 f'Oi {pessoa}, aqui é da Loja São Lucas da BR-316, '
                 f'verificamos que o senhor(a) tem débito(s) '

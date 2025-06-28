@@ -78,16 +78,16 @@ class CustomersDatabase:
             connect.close()
 
             # Changes in the customer list
-            result_processed = self.number_processing(result)
-            result_refined = self.to_delete_customers(
-                self.excluded_customers, result_processed
+            customers_list = self.number_processing(result)
+            customer_list_some_deleted = self.to_delete_customers(
+                self.excluded_customers, customers_list
             )
             if self.inserted_customers[0] != '':
-                result_finally = self.to_insert_customers(
-                    self.inserted_customers, result_refined
+                customer_list_some_inserted = self.to_insert_customers(
+                    self.inserted_customers, customer_list_some_deleted
                 )
-                return result_finally
-            return result_refined
+                return customer_list_some_inserted
+            return customer_list_some_deleted
 
     def number_processing(self, ans):
         """Filters numbers equal to 13 digits"""

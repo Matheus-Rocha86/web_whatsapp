@@ -4,22 +4,22 @@ from selenium.webdriver.chrome.service import Service
 
 
 class WebChromeBrowser:
-    """Nevegador Chrome configurado."""
+    """Chrome browser configured."""
     def __init__(self):
 
         OPTIONS = (
-            '--ignore-certificate-errors',  # Ignora erros de certificado
-            '--ignore-ssl-errors',  # Ignora erros SSL
-            '--disable-crl-checks',  # Desativa verificação CRL
-            '--disable-extensions',  # Desativa extensões que podem interferir
-            '--no-sandbox',  # Necessário em alguns sistemas
-            '--disable-dev-shm-usage',  # Evita problemas de memória
-            '--log-level=3'  # Nível 3 suprime a maioria dos logs
+            '--ignore-certificate-errors',  # Ignore certificate errors
+            '--ignore-ssl-errors',  # Ignore SSL errors
+            '--disable-crl-checks',  # Disable CRL checking
+            '--disable-extensions',  # Disable extensions that may interfere
+            '--no-sandbox',  # Required on some systems
+            '--disable-dev-shm-usage',  # Avoids memory problems
+            '--log-level=3'  # Level 3 suppresses most logs
         )
-        # Caminho para a raiz do projeto
+        # Path to project root
         ROOT_FOLDER = Path(__file__).parent
 
-        # Caminho para a pasta onde o chromedriver está
+        # Path to the folder where chromedriver is located
         CHROME_DRIVER_PATH = ROOT_FOLDER / 'drivers' / 'chromedriver.exe'
 
         chrome_options = webdriver.ChromeOptions()
@@ -38,4 +38,5 @@ class WebChromeBrowser:
         )
 
     def get_driver(self):
+        """Returns the configured browser"""
         return self.driver
