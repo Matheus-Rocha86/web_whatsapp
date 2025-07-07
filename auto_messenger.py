@@ -9,6 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from time import sleep
 from datetime import datetime
 from random import randint
+from db_whatsapp import insert_data
 
 
 class AutoMessenger:
@@ -23,8 +24,8 @@ class AutoMessenger:
     returns a None value.
     """
 
-    def __init__(self, costumers_list, browser: WebDriver, website: str, billing_message=None):
-        self.costumers_list = costumers_list
+    def __init__(self, customers: list[tuple], browser: WebDriver, website: str, billing_message=None):
+        self.customers: list[tuple] = customers
         self.browser: WebDriver = browser
         self.website = website
         self.billing_message = billing_message
@@ -59,13 +60,13 @@ class AutoMessenger:
         to_day = datetime.today().strftime('%d-%m-%Y')
 
         # Create progress bar
-        progress_bar = tqdm(range(len(self.costumers_list)), desc="Enviando mensagens")
+        progress_bar = tqdm(range(len(self.customers)), desc="Enviando mensagens")
 
         #  Scroll through the contact list and send the message
         for i in progress_bar:
-            pessoa = self.costumers_list[i][0]
-            valor = self.costumers_list[i][1]
-            numero = self.costumers_list[i][2]
+            pessoa = self.customers[i][0]
+            valor = self.customers[i][1]
+            numero = self.customers[i][2]
 
             # Updates the description dynamically
             progress_bar.set_description(f"Enviando para {pessoa}")
@@ -103,8 +104,11 @@ class AutoMessenger:
                     print(f'Exceção: {e}')
             else:
                 # Creates a list of tuples with customer data
-                from_costumers_list_to_data = (pessoa, valor, to_day)
-                self.data.append(from_costumers_list_to_data)
+                from_customers_to_data = (pessoa, valor, to_day)
+                self.data.append(from_customers_to_data)
+
+                # Save to the database
+                insert_data(self.data)
         self.browser.quit()
         print()
         print('-' * 25)
@@ -139,8 +143,8 @@ class AutoMessenger:
         else:
             text = (
                 f'Olá {pessoa}, tudo bem? '
-                f'Gostaríamos de lembrar sobre o pagamento '
-                f'pendente do(s) seu(s) débito(s). '
+                f'Gostaríamos de lembrar sobre o *pagamento* '
+                f'*pendente* do(s) seu(s) débito(s). '
                 f'Caso já tenha efetuado o pagamento, por favor, '
                 f'desconsidere este lembrete. Agradecemos a sua atenção!'
             )

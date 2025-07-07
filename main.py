@@ -3,7 +3,6 @@ from auto_messenger import AutoMessenger
 from clients import CustomersDatabase
 from browser import WebChromeBrowser
 from format_print import format_print
-from db_whatsapp import insert_data
 from datetime import datetime
 from users import check_users
 from checker_data import get_user_input, get_yes_no_input
@@ -72,8 +71,8 @@ if __name__ == "__main__":
         # Instantiate the message object
         kwargs = {
             'customers': customers,
-            'driver': driver,
-            'url': 'https://web.whatsapp.com/'
+            'browser': driver,
+            'website': 'https://web.whatsapp.com/'
         }
         if message_type == 'S':
             kwargs['billing_message'] = message_type
@@ -82,9 +81,6 @@ if __name__ == "__main__":
 
         # Send the charges
         billed_customers = message_conf.run_billing()
-
-        # Save to the database
-        insert_data(billed_customers)
     else:
         print('Thanks!')
         sys.exit()
